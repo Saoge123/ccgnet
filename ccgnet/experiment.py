@@ -141,7 +141,7 @@ class Model(object):
         else:
             self.inputs = create_graph_placeholders(train_data, use_desc=use_desc, 
                                               with_tags=with_tags, with_attention=with_attention, use_subgraph=use_subgraph)
-        self.pred_out, self.labels, self.prob = model.build_model(self.inputs, self.is_training, self.global_step)
+        self.pred_out, self.labels = model.build_model(self.inputs, self.is_training, self.global_step)
         self.snapshot_path = snapshot_path+'/%s/%s/' % (model_name, dataset_name)
         self.test_summary_path = summary_path+'/%s/test/%s' %(model_name, dataset_name)
         self.train_summary_path = summary_path+'/%s/train/%s' %(model_name, dataset_name)
