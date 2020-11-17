@@ -78,6 +78,6 @@ class Bond(object):
         except:
             print('bond type is out of range {}'+self.bond_type)
             self.type_number = 5
-        self.length = np.linalg.norm(np.array(self.end_atom_coor)-np.array(self.begin_atom_coor))  # 键长
-        self.is_ring = rdkit_bond.IsInRing()  # 键是否是环的一部分
-        self.is_conjugated = rdkit_bond.GetIsConjugated()  # 是否共轭
+        self.length = np.linalg.norm(np.array(self.end_atom_coor)-np.array(self.begin_atom_coor))
+        self.is_ring = rdkit_bond.IsInRing()
+        self.is_conjugated = rdkit_bond.GetIsConjugated()
