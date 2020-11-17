@@ -7,30 +7,30 @@ HBondCriterion = ccdc.molecule.Molecule.HBondCriterion()
 class atom_feat(object):
     def __init__(self, Atom, hb_criterion=HBondCriterion):
         self.coordinates = Atom.rdkit_coor
-        self.symbol = Atom.rdkit_atom.GetSymbol()   # 元素符号
-        self.hybridization = Atom.rdkit_atom.GetHybridization().__str__()  # 杂化类型， 关于 R-O-CO-R, RCOOH中O的杂化类型，rdkit给出的是sp2，ccdc给出的是sp3
-        #chirality = atom.GetChiralTag().__str__()    # 手性
-        self.chirality = Atom.csd_atom.chirality    # 手性，Returns one of '', 'R', 'S', 'Mixed', 'Error'
-        self.is_chiral = Atom.csd_atom.is_chiral       # 是否为手性原子
-        self.explicitvalence = Atom.rdkit_atom.GetExplicitValence()  # 化合价
-        self.implicitvalence = Atom.rdkit_atom.GetImplicitValence()  # 隐式化合价
-        self.totalnumHs = Atom.rdkit_atom.GetTotalNumHs()   # 与该原子相连的氢原子数
+        self.symbol = Atom.rdkit_atom.GetSymbol()
+        self.hybridization = Atom.rdkit_atom.GetHybridization().__str__()
+        #chirality = atom.GetChiralTag().__str__()
+        self.chirality = Atom.csd_atom.chirality
+        self.is_chiral = Atom.csd_atom.is_chiral
+        self.explicitvalence = Atom.rdkit_atom.GetExplicitValence()
+        self.implicitvalence = Atom.rdkit_atom.GetImplicitValence()
+        self.totalnumHs = Atom.rdkit_atom.GetTotalNumHs()
         #print(totalnumHs)
-        self.formalcharge = Atom.rdkit_atom.GetFormalCharge()  # 形式电荷
-        self.radical_electrons = Atom.rdkit_atom.GetNumRadicalElectrons()  #自由基电子数
-        self.is_aromatic = Atom.rdkit_atom.GetIsAromatic()     # 是否芳香原子
+        self.formalcharge = Atom.rdkit_atom.GetFormalCharge()
+        self.radical_electrons = Atom.rdkit_atom.GetNumRadicalElectrons()
+        self.is_aromatic = Atom.rdkit_atom.GetIsAromatic()
         
-        self.is_acceptor = hb_criterion.is_acceptor(Atom.csd_atom)   # 是否为氢键受体
-        self.is_donor = hb_criterion.is_donor(Atom.csd_atom)         # 是否为氢键供体
-        self.is_spiro = Atom.csd_atom.is_spiro         # 是否是螺原子
-        self.is_cyclic = Atom.csd_atom.is_cyclic       # 是否在环上
-        self.is_metal = Atom.csd_atom.is_metal         # 是否是金属
+        self.is_acceptor = hb_criterion.is_acceptor(Atom.csd_atom)
+        self.is_donor = hb_criterion.is_donor(Atom.csd_atom)
+        self.is_spiro = Atom.csd_atom.is_spiro
+        self.is_cyclic = Atom.csd_atom.is_cyclic
+        self.is_metal = Atom.csd_atom.is_metal
 
-        self.atomic_weight = Atom.rdkit_atom.GetMass()   # 相对原子质量
-        self.atomic_number = Atom.rdkit_atom.GetAtomicNum()  # 元素序号（元素周期表中）
-        self.vdw_radius = Atom.csd_atom.vdw_radius     # 范德华半径
-        self.sybyl_type = Atom.csd_atom.sybyl_type     # sybyl原子类型，参见：http://www.tri-ibiotech.com.cn/Appofcase/n247.html
-        self.degree = Atom.rdkit_atom.GetDegree()         # 度
+        self.atomic_weight = Atom.rdkit_atom.GetMass()
+        self.atomic_number = Atom.rdkit_atom.GetAtomicNum()
+        self.vdw_radius = Atom.csd_atom.vdw_radius
+        self.sybyl_type = Atom.csd_atom.sybyl_type
+        self.degree = Atom.rdkit_atom.GetDegree()
         
 class Atom(object):
     def __init__(self, rdkit_atom, csd_atom, hb_criterion=HBondCriterion):
