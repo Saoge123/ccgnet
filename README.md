@@ -29,3 +29,10 @@ First, you need to prepare the structure files of each coformer, whose format ca
 Then, a table that reprensents the pairs of coformers should be generated. Each item in line is separated by "\t". like this:
 
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/table-example.png)
+
+The value of the last column is arbitrary, as long as it is an integer.
+
+~~~
+python predict.py -table cc_table.csv -mol_dir ./coformers -out cc_test.xlsx -fmt sdf -type cc
+~~~
+Finally, the predictive result is write into a .xlsx file, eg. cc_test.xlsx.
