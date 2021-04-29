@@ -6,7 +6,7 @@ Requirements:
 * Tensorflow (1.6=<Version<2.0)
 * RDKit
 * Openbabel 2.4.1
-* CCDC Python API
+* CCDC Python API  (this dependency has been removed for better open source, but the performance may decrease slightly.)
 * Scikit-learn
 
 The ccgnet module could be used to build CCGNet models. In ccgnet, the message passing is implement by Graph-CNN, where the code of this part we borrow from https://github.com/fps7806/Graph-CNN. The Featurize module represents the combination of two molecules as the input of CCGNet models.
