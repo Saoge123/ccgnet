@@ -36,5 +36,6 @@ The value of the last column is arbitrary, as long as it is an integer.
 python predict.py -table cc_table.csv -mol_dir ./coformers -out cc_test.xlsx -fmt sdf -type cc
 ~~~
 All pairs were sorted by the predive score from high to low. The higher score, the higher possibility to form cocrystal.
+
 Finally, the predictive result is write into a .xlsx file, eg. cc_test.xlsx. 
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/xlsx.png)
