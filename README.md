@@ -27,4 +27,4 @@ optional arguments:
 ~~~
 First, you need to prepare the structure files of each coformer, whose format can be 'sdf', 'mol', 'mol2'.
 Then, a table that reprensents the pairs of coformers should be generated. Each item in line is separated by '\t'.
-Like this:
+![Like this:](https://github.com/Saoge123/ccgnet/master/img/table-example.png)
