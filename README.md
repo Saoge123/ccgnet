@@ -37,5 +37,5 @@ python predict.py -table cc_table.csv -mol_dir ./coformers -out cc_test.xlsx -fm
 ~~~
 All pairs were sorted by the predictve score from high to low. The higher score, the higher possibility to form cocrystal.
 
-Finally, the predictive result is write into a .xlsx file, eg. cc_test.xlsx. 
+Finally, the predictive result is written in a .xlsx file, eg. cc_test.xlsx. 
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/xlsx.png)
