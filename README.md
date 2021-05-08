@@ -31,14 +31,14 @@ optional arguments:
                         ./snapshot/CCGNet_block/CC_Dataset/
 ~~~
 First, you need to prepare the structure files of each coformer, whose format can be 'sdf', 'mol', 'mol2'.
-Then, a table that reprensents the pairs of coformers should be generated. Each item in line is separated by "\t". like this:
+Then, a table that reprensents the pairs of coformers should be generated. Each item in line is separated by "tab". like this:
 
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/table-example.png)
 
 The value of the last column is arbitrary, as long as it is an integer. 
 
 ~~~
-python predict.py -table cc_table.csv -mol_dir ./coformers -out cc_test.xlsx -fmt sdf -type cc
+python predict.py -table ./Test/Test_Table.tab -mol_dir ./Test/coformers -out cc_test.xlsx -fmt sdf -model_path ./inference_model/CC_Model/
 ~~~
 All pairs were sorted by the predictve score from high to low. The higher score, the higher possibility to form cocrystal.
 
