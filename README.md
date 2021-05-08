@@ -50,7 +50,7 @@ In CCGNet, Coformer object is the basic data unit, for each compound:
 ~~~
 from Featurize import Coformer
 
-c = Coformer('coformers/1983.sdf')
+c = Coformer('./Test/coformers/1983.sdf')
 A = c.AdjacentTensor.OnlyCovalentBond(with_coo=False)
 # if with_coo=True, it will return the adjacent tensor with COO format, which is easy to feed other GNN framework, such as pytorch-geometric.
 
@@ -58,6 +58,17 @@ V = c.VertexMatrix.feature_matrix()
 global_state = c.descriptors()
 print(A.shape, V.shape, global_state.shape)
 (20, 4, 20) (20, 34) (12,)
-
 ~~~
-Two Coformer objects can be transformed a Cocrystal object:
+Two Coformer objects can be transformed a Cocrystal object. The features can be calculated by the same way:
+~~~
+from Featurize import Coformer, Cocrystal
+
+c1 = Coformer('coformers/1983.sdf')
+c2 = Coformer('coformers/1110.sdf')
+cc = Cocrystal(c1, c2)
+A_cc = cc.AdjacentTensor.OnlyCovalentBond(with_coo=False)
+V_cc = cc.VertexMatrix.feature_matrix()
+global_state_cc = cc.descriptors()
+print(A_cc.shape, V_cc.shape, global_state_cc.shape)
+(34, 4, 34) (34, 34) (24,)
+~~~
