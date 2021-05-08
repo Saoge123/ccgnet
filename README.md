@@ -31,13 +31,13 @@ optional arguments:
                         ./snapshot/CCGNet_block/CC_Dataset/
 ~~~
 First, you need to prepare the structure files of each coformer, whose format can be 'sdf', 'mol', 'mol2'.
-Then, a table that reprensents the pairs of coformers should be generated. Each item in line is separated by "tab". like this:
+Then, a table that reprensents the pairs of coformers should be generated. Each item in line is separated by "\t". like this:
 
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/table-example.png)
 
 The value of the last column is arbitrary, as long as it is an integer. 
 
-e.g. We use the test samples
+Here, we use the testing samples in our work as an example
 ~~~
 python predict.py -table ./Test/Test_Table.tab -mol_dir ./Test/coformers -out cc_test.xlsx -fmt sdf -model_path ./inference_model/CC_Model/
 ~~~
@@ -45,3 +45,4 @@ All pairs were sorted by the predictve score from high to low. The higher score,
 
 Finally, the predictive result is written in a .xlsx file, eg. cc_test.xlsx. 
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/xlsx.png)
+
