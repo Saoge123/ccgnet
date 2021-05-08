@@ -77,8 +77,8 @@ Two Coformer objects can be transformed to a Cocrystal object. The features can 
 ~~~
 from Featurize import Coformer, Cocrystal
 
-c1 = Coformer('coformers/1983.sdf')
-c2 = Coformer('coformers/1110.sdf')
+c1 = Coformer('./Test/coformers/1983.sdf')
+c2 = Coformer('./Test/coformers/1110.sdf')
 cc = Cocrystal(c1, c2)
 A_cc = cc.AdjacentTensor.OnlyCovalentBond(with_coo=False)
 V_cc = cc.VertexMatrix.feature_matrix()
