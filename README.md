@@ -37,6 +37,7 @@ Then, a table that reprensents the pairs of coformers should be generated. Each 
 
 The value of the last column is arbitrary, as long as it is an integer. 
 
+e.g. We use the test samples
 ~~~
 python predict.py -table ./Test/Test_Table.tab -mol_dir ./Test/coformers -out cc_test.xlsx -fmt sdf -model_path ./inference_model/CC_Model/
 ~~~
