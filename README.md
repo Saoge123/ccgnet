@@ -9,7 +9,7 @@ Requirements:
 * CCDC Python API 
 * Scikit-learn
 
-**Note**: if you don't have CCDC Python API, you can try the ccgnet-OB which has removed CCDC Python API for better open source, but the performance may decrease slightly.
+**Note**: if you don't have CCDC Python API, you can try the ccgnet-OB which has been removed this dependency for better open source, but the performance may decrease slightly.
 
 The ccgnet module could be used to build CCGNet models. In ccgnet, the message passing is implement by Graph-CNN, where the code of this part we borrow from https://github.com/fps7806/Graph-CNN. The Featurize module represents the combination of two molecules as the input of CCGNet models.
 # usage
