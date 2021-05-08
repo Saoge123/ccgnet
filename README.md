@@ -46,3 +46,19 @@ All pairs were sorted by the predictve score from high to low. The higher score,
 Finally, the predictive result is written in a .xlsx file, eg. cc_test.xlsx. 
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/xlsx.png)
 
+In CCGNet, Coformer object is the basic data unit, for each compound:
+~~~
+In [1]: from Featurize import Coformer
+
+In [2]: c = Coformer('coformers/1983.sdf')
+
+In [3]: A = c.AdjacentTensor.OnlyCovalentBond(with_coo=False)
+
+In [4]: V = c.VertexMatrix.feature_matrix()
+
+In [5]: global_state = c.descriptors()
+
+In [6]: print(A.shape, V.shape, global_state.shape)
+(20, 4, 20) (20, 34) (12,)
+
+~~~
