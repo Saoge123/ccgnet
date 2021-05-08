@@ -52,7 +52,8 @@ from Featurize import Coformer
 
 c = Coformer('./Test/coformers/1983.sdf')
 A = c.AdjacentTensor.OnlyCovalentBond(with_coo=False)
-# if with_coo=True, it will return the adjacent tensor with COO format, which is easy to feed other GNN framework, such as pytorch-geometric.
+# if with_coo=True, it will return the adjacent tensor with COO format, 
+#which is easy to feed other GNN framework, such as pytorch-geometric.
 
 V = c.VertexMatrix.feature_matrix()
 global_state = c.descriptors()
