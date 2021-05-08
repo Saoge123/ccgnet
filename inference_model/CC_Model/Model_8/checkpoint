@@ -1,0 +1,6 @@
+model_checkpoint_path: "TestAcc-99.87-67"
+all_model_checkpoint_paths: "TestAcc-98.32-4"
+all_model_checkpoint_paths: "TestAcc-98.96-5"
+all_model_checkpoint_paths: "TestAcc-99.48-6"
+all_model_checkpoint_paths: "TestAcc-99.61-30"
+all_model_checkpoint_paths: "TestAcc-99.87-67"
