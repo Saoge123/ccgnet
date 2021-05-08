@@ -63,7 +63,8 @@ A = c.AdjacentTensor.WithBondLenth(with_coo=False)
 A.shape
 #Out: (20, 5, 20)
 ~~~
-
+The extra channel in axis=1 denotes the bond lenth. Each element either 0 or the bond lenth.
+There are some other methods to compute adjacent tensor, please see Featurize/AdjacentTensor.py .
 
 The atom features and global_state can be computed by:
 ~~~
@@ -84,4 +85,23 @@ V_cc = cc.VertexMatrix.feature_matrix()
 global_state_cc = cc.descriptors()
 print(A_cc.shape, V_cc.shape, global_state_cc.shape)
 #Out: (34, 4, 34) (34, 34) (24,)
+~~~
+Here, we also defined the possible intermolecular interaction. To reprensent potential H-bonds, you can add edge between potential H-bond donnors and accptors
+~~~
+A_hb = cc.CCGraphTensor(t_type='OnlyCovalentBond', hbond=True)
+A_hb.shape
+#Out: (34, 5, 34) 
+~~~
+If you want to add possible π-π stack:
+~~~
+A_hb_pp = cc.CCGraphTensor(t_type='OnlyCovalentBond', hbond=True, pipi_stack=True)
+A_hb_pp.shape
+#Out: (34, 6, 34)
+#You can add edge between potential aromatic atoms, but the complexity of cc graph will increase.
+~~~
+Furthermore, if you want to add possible weak H-bond interaction, such as C-H···O, C-H···N :
+~~~
+A_hb_pp_c = cc.CCGraphTensor(t_type='OnlyCovalentBond', hbond=True, pipi_stack=True, contact=True)
+A_hb_pp_c.shape
+#Out: (34, 7, 34)
 ~~~
