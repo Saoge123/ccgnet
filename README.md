@@ -52,15 +52,27 @@ from Featurize import Coformer
 
 c = Coformer('./Test/coformers/1983.sdf')
 A = c.AdjacentTensor.OnlyCovalentBond(with_coo=False)
-# if with_coo=True, it will return the adjacent tensor with COO format, 
-#which is easy to feed other GNN framework, such as pytorch-geometric.
+A.shape
+(20, 4, 20)
+~~~
+If with_coo=True, it will return the adjacent tensor with COO format, which is easy to feed other GNN framework, such as pytorch-geometric.
+The method 'OnlyCovalentBond' only consider the four type of covalent bonds, such as single, double, triple and aromatic bonds.
+If you want to add bond lenth:
+~~~
+A = c.AdjacentTensor.WithBondLenth(with_coo=False)
+A.shape
+#Out: (20, 5, 20)
+~~~
 
+
+The atom features and global_state can be computed by:
+~~~
 V = c.VertexMatrix.feature_matrix()
 global_state = c.descriptors()
 print(A.shape, V.shape, global_state.shape)
-(20, 4, 20) (20, 34) (12,)
+#Out: (20, 34) (12,)
 ~~~
-Two Coformer objects can be transformed a Cocrystal object. The features can be calculated by the same way:
+Two Coformer objects can be transformed to a Cocrystal object. The features can be calculated by the same way:
 ~~~
 from Featurize import Coformer, Cocrystal
 
@@ -71,5 +83,5 @@ A_cc = cc.AdjacentTensor.OnlyCovalentBond(with_coo=False)
 V_cc = cc.VertexMatrix.feature_matrix()
 global_state_cc = cc.descriptors()
 print(A_cc.shape, V_cc.shape, global_state_cc.shape)
-(34, 4, 34) (34, 34) (24,)
+#Out: (34, 4, 34) (34, 34) (24,)
 ~~~
