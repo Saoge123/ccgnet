@@ -235,7 +235,8 @@ class CCGNet_block(object):
         out = layers.make_embedding_layer(V, 2, name='final')
         return out, labels
 ~~~
-Then, we will fit model. In this case, model and log will be saved at ''./snapshot/CCGNet_block/CC_Dataset/time_0'
+Then, we will fit model. In this case, model and log will be saved at './snapshot/CCGNet_block/CC_Dataset/time_*'.
+
 ~~~
 start = time.time()
 snapshot_path = './snapshot/'
