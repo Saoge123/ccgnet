@@ -244,9 +244,6 @@ start = time.time()
 snapshot_path = './snapshot/'
 model_name = 'CCGNet_block'
 dataset_name = 'CC_Dataset'
-History = {}
-History['test_acc'] = []
-History['val_acc'] = []
 for fold in ['fold-{}'.format(i) for i in range(10)]:
     print('\n################ {} ################'.format(fold))
     train_data, valid_data, test_data = data.split(train_samples=fold_10[fold]['train'], valid_samples=fold_10[fold]['valid'], with_test=True, test_samples=fold_10['test'])
@@ -256,10 +253,6 @@ for fold in ['fold-{}'.format(i) for i in range(10)]:
                       model_name=model_name, dataset_name=dataset_name+'/time_{}'.format(fold[-1]))
     history = model.fit(num_epoch=100, save_info=True, save_att=True, silence=0, train_batch_size=256,
                         metric='acc')
-    History['test_acc'].append(max(history['test_acc']))
-    History['val_acc'].append(history['val_acc'])
-print('test_mean_acc:{:.4f}(+-{:.4f})'.format(np.array(History['test_acc']).mean()*100,np.array(History['test_acc']).std()*100))
-print('val_mean_acc:{:.4f}(+-{:.4f})'.format(np.array(History['val_acc']).mean()*100,np.array(History['val_acc']).std()*100))
 end = time.time()
 time_gap = end-start
 h = time_gap//3600
