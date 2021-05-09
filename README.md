@@ -59,7 +59,7 @@ A.shape
 If with_coo=True, it will return the adjacent tensor with COO format, which is easy to feed other GNN framework, such as pytorch-geometric.
 The method 'OnlyCovalentBond' only consider the four type of covalent bonds, such as single, double, triple and aromatic bonds.
 If you want to add bond lenth:
-~~~
+~~~python
 A = c.AdjacentTensor.WithBondLenth(with_coo=False)
 A.shape
 #Out: (20, 5, 20)
@@ -68,14 +68,14 @@ The extra channel in axis=1 denotes the bond lenth. Each element either 0 or the
 There are some other methods to compute adjacent tensor, please see Featurize/AdjacentTensor.py .
 
 The atom features and global_state can be computed by:
-~~~
+~~~python
 V = c.VertexMatrix.feature_matrix()
 global_state = c.descriptors()
 print(V.shape, global_state.shape)
 #Out: (20, 34) (12,)
 ~~~
 Two Coformer objects can be transformed to a Cocrystal object. The features can be calculated by the same way:
-~~~
+~~~python
 from Featurize import Coformer, Cocrystal
 
 c1 = Coformer('./Test/coformers/1983.sdf')
@@ -88,20 +88,20 @@ print(A_cc.shape, V_cc.shape, global_state_cc.shape)
 #Out: (34, 4, 34) (34, 34) (24,)
 ~~~
 Here, we also defined the possible intermolecular interaction. To reprensent potential H-bonds, you can add edge between potential H-bond donnors and accptors
-~~~
+~~~python
 A_hb = cc.CCGraphTensor(t_type='OnlyCovalentBond', hbond=True)
 A_hb.shape
 #Out: (34, 5, 34) 
 ~~~
 If you want to add possible π-π stack:
-~~~
+~~~python
 A_hb_pp = cc.CCGraphTensor(t_type='OnlyCovalentBond', hbond=True, pipi_stack=True)
 A_hb_pp.shape
 #Out: (34, 6, 34)
 #You can add edge between potential aromatic atoms, but the complexity of cc graph will increase.
 ~~~
 Furthermore, if you want to add possible weak H-bond interaction, such as C-H···O, C-H···N :
-~~~
+~~~python
 A_hb_pp_c = cc.CCGraphTensor(t_type='OnlyCovalentBond', hbond=True, pipi_stack=True, contact=True)
 A_hb_pp_c.shape
 #Out: (34, 7, 34)
@@ -112,7 +112,7 @@ First, you need prepare two files like 'CC_Table.tab' and 'Mol_Blocks.dir' in '.
 'Mol_Blocks.dir' is a text file with python dictionary format, whose key is the coformer name in 'CC_Table.tab' and value is string with 3D 'sdf' format.
 
 **Note** that the input 'sdf' string should preferably be an optimized 3D structure.
-~~~
+~~~python
 mol_block = eval(open('./Samples/Mol_Blocks.dir').read())
 print(mol_block['1983'])
 '''
@@ -165,7 +165,7 @@ $$$$
 '''
 ~~~
 We can build the dataset based on these two file, such as:
-~~~
+~~~python
 from ccgnet.Dataset import Dataset, DataLoader
 
 data = Dataset('./Samples/CC_Table.tab', mol_blocks_dir='./Samples/Mol_Blocks.dir')
@@ -173,12 +173,12 @@ data.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0
 ~~~
 If save_name is not None, the dataset will be saved as a 'save_name'.npz file to your disk.
 If make_dataframe=True, object data will make a new property .dataframe. Each entry holds the data for the corresponding sample, like:
-~~~
+~~~python
 data.dataframe['UNEYOB'].keys()
 #Out: dict_keys(['V', 'A', 'label', 'global_state', 'tag', 'mask', 'graph_size', 'subgraph_size'])
 ~~~
 To train and test the model, we firstly split out the test set.
-~~~
+~~~python
 nico = eval(open('./Test/test_samples/Nicotinamide_Test.list').read())
 carb = eval(open('./Test/test_samples/Carbamazepine_Test.list').read())
 indo = eval(open('./Test/test_samples/Indomethacin_Test.list').read())
@@ -188,7 +188,7 @@ pyre = eval(open('./Test/test_samples/Pyrene_Test.list').read())
 test = list(set(nico + carb + indo + para + pyre))
 ~~~
 Here, we perform a 10-fold cross-validation.
-~~~
+~~~python
 from sklearn.model_selection import KFold
 
 cv = np.array([i for i in data.dataframe if i not in test])
@@ -205,7 +205,7 @@ for train_idx, test_idx in kf.split(cv):
     n += 1
 ~~~
 The model construction.
-~~~
+~~~python
 import tensorflow as tf
 from ccgnet import experiment as exp
 from ccgnet import layers
@@ -239,7 +239,7 @@ class CCGNet_block(object):
 Then, we will fit model. In this case, model and log will be saved at './snapshot/CCGNet_block/CC_Dataset/time_*'.
 
 We call data.split to split train_data, valid_data and test_data. The test_data is optional. In model training, ccgnet will save the models that hold best 5 performance (default). You can increase or decrease the number of saving models by changing the value of 'max_to_keep'. When higher performance is achieved in valid set, ccgnet will save the weights and make inference for test set (if with_test=True). Also, you can use the saved model to perform inference on the test set after training.
-~~~
+~~~python
 start = time.time()
 snapshot_path = './snapshot/'
 model_name = 'CCGNet_block'
@@ -262,7 +262,7 @@ s = h_m%60
 print('{}h {}m {}s'.format(int(h),int(m),round(s,2)))
 ~~~
 You can use the Featurize.MetricsReport module to assess model performance in 10-fold CV.
-~~~
+~~~python
 from Featurize.MetricsReport import model_metrics_report
 
 model_metrics_report('{}/{}/'.format(snapshot_path, model_name))
