@@ -237,7 +237,7 @@ class CCGNet_block(object):
 ~~~
 Then, we will fit model. In this case, model and log will be saved at './snapshot/CCGNet_block/CC_Dataset/time_*'.
 
-We call data.split to split train_data, valid_data and test_data. The test_data is optional. In model training, ccgnet will save the models that hold best 5 performance (default). You can increase or decrease the number of saving models by changing the value of 'max_to_keep'. When higher performance is achieved in valid set, ccgnet will save the weights and make inference for test set (if with_test=True). Also, you can use the saved model to perform inference on the test set after training
+We call data.split to split train_data, valid_data and test_data. The test_data is optional. In model training, ccgnet will save the models that hold best 5 performance (default). You can increase or decrease the number of saving models by changing the value of 'max_to_keep'. When higher performance is achieved in valid set, ccgnet will save the weights and make inference for test set (if with_test=True). Also, you can use the saved model to perform inference on the test set after training.
 ~~~
 start = time.time()
 snapshot_path = './snapshot/'
