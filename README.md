@@ -162,18 +162,111 @@ M  END
 $$$$
 '''
 ~~~
-We can build the dataset based on the two file:
+We can build the dataset based on these two file, such as:
 ~~~
 from ccgnet.Dataset import Dataset, DataLoader
 
 data = Dataset('./Samples/CC_Table.tab', mol_blocks_dir='./Samples/Mol_Blocks.dir')
 data.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0, contact=0, make_dataframe=True, save_name=None)
 ~~~
-If save_name is not None, the dataset will be saved as a 'save_name'.npz file to your disk. 
+If save_name is not None, the dataset will be saved as a 'save_name'.npz file to your disk.
+If make_dataframe=True, object data will make a new property .dataframe. Each entry holds the data for the corresponding sample, like:
+~~~
+data.dataframe['UNEYOB'].keys()
+#Out: dict_keys(['V', 'A', 'label', 'global_state', 'tag', 'mask', 'graph_size', 'subgraph_size'])
+~~~
+To train and test the model, we firstly split out the test set.
+~~~
+nico = eval(open('./Test/test_samples/Nicotinamide_Test.list').read())
+carb = eval(open('./Test/test_samples/Carbamazepine_Test.list').read())
+indo = eval(open('./Test/test_samples/Indomethacin_Test.list').read())
+para = eval(open('./Test/test_samples/Paracetamol_Test.list').read())
+pyre = eval(open('./Test/test_samples/Pyrene_Test.list').read())
+# these samples that are selected as out-of-sample test are the same with our paper.
+test = list(set(nico + carb + indo + para + pyre))
+~~~
+Here, we perform a 10-fold cross-validation.
+~~~
+from sklearn.model_selection import KFold
+
+cv = np.array([i for i in data.dataframe if i not in test])
+np.random.shuffle(cv)
+fold_10 = {}
+fold_10['test'] = test
+kf = KFold(n_splits=10, shuffle=True, random_state=1000)
+n = 0
+for train_idx, test_idx in kf.split(cv):
+    fold = 'fold-{}'.format(n)
+    fold_10[fold] = {}
+    fold_10[fold]['train'] = cv[train_idx]
+    fold_10[fold]['valid'] = cv[test_idx]
+    n += 1
+~~~
+The model construction.
 ~~~
 import tensorflow as tf
 from ccgnet import experiment as exp
 from ccgnet import layers
 import time
-from ccgnet.Dataset import Dataset, DataLoader
+
+class CCGNet_block(object):
+    def build_model(self, inputs, is_training, global_step):
+        V = inputs[0]
+        A = inputs[1]
+        labels = inputs[2]
+        mask = inputs[3]
+        graph_size = inputs[4]
+        tags = inputs[5]
+        global_state = inputs[6]
+        subgraph_size = inputs[7]
+        global_state = tf.reshape(global_state, [-1, int(global_state.get_shape()[-1].value/2)])
+        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=128, mask=mask, num_updates=global_step, is_training=is_training)
+        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=64, mask=mask, num_updates=global_step, is_training=is_training)
+        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=64, mask=mask, num_updates=global_step, is_training=is_training)
+        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=32, mask=mask, num_updates=global_step, is_training=is_training)
+        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=16, mask=mask, num_updates=global_step, is_training=is_training)
+        V = layers.multi_head_global_attention(V, graph_size, num_head=10)
+        global_state = tf.reshape(global_state, [-1, 32])
+        V = tf.concat([V, global_state], 1)
+        V = layers.make_embedding_layer(V, 256, name='FC')
+        V = layers.make_bn(V, is_training, mask=None, num_updates=global_step)
+        V = tf.nn.relu(V)
+        out = layers.make_embedding_layer(V, 2, name='final')
+        return out, labels
+~~~
+Then, we will fit model. In this case, model and log will be saved at ''./snapshot/CCGNet_block/CC_Dataset/time_0'
+~~~
+start = time.time()
+snapshot_path = './snapshot/'
+model_name = 'CCGNet_block'
+dataset_name = 'CC_Dataset'
+History = {}
+History['test_acc'] = []
+History['val_acc'] = []
+for fold in ['fold-{}'.format(i) for i in range(10)]:
+    print('\n################ {} ################'.format(fold))
+    train_data, valid_data, test_data = data.split(train_samples=fold_10[fold]['train'], test_samples=fold_10[fold]['valid'], val=True, val_samples=fold_10['test'])
+    tf.reset_default_graph()
+    model = CCGNet_block()
+    model = exp.Model(model, train_data, valid_data, with_test=True, test_data=test_data, snapshot_path=snapshot_path, use_subgraph=True,
+                      model_name=model_name, dataset_name=dataset_name+'/time_{}'.format(fold[-1]))
+    history = model.fit(num_epoch=100, save_info=True, save_att=True, silence=0, train_batch_size=256,
+                        metric='acc')
+    History['test_acc'].append(max(history['test_acc']))
+    History['val_acc'].append(history['val_acc'])
+print('test_mean_acc:{:.4f}(+-{:.4f})'.format(np.array(History['test_acc']).mean()*100,np.array(History['test_acc']).std()*100))
+print('val_mean_acc:{:.4f}(+-{:.4f})'.format(np.array(History['val_acc']).mean()*100,np.array(History['val_acc']).std()*100))
+end = time.time()
+time_gap = end-start
+h = time_gap//3600
+h_m = time_gap%3600
+m = h_m//60
+s = h_m%60
+print('{}h {}m {}s'.format(int(h),int(m),round(s,2)))
+~~~
+You can use the Featurize.MetricsReport module to assess model performance in 10-fold CV.
+~~~
+from Featurize.MetricsReport import model_metrics_report
+
+model_metrics_report('{}/{}/'.format(snapshot_path, model_name))
 ~~~
