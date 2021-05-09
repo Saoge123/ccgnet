@@ -105,3 +105,74 @@ A_hb_pp_c = cc.CCGraphTensor(t_type='OnlyCovalentBond', hbond=True, pipi_stack=T
 A_hb_pp_c.shape
 #Out: (34, 7, 34)
 ~~~
+If you want to make your own dataset, ccgnet also provide Dataset class.
+First, you need prepare two files like 'CC_Table.tab' and 'Mol_Blocks.dir' in './Samples/'.
+'CC_Table.tab' reprensents the pairs of coformers. 
+'Mol_Blocks.dir' is a text file with python dictionary format, whose key is the coformer name in 'CC_Table.tab' and value is string with 3D 'sdf' format.
+Note that the input 'sdf' string should preferably be an optimized 3D structure.
+~~~
+mol_block = eval(open('./Samples/Mol_Blocks.dir').read())
+print(mol_block['1983'])
+'''
+1983
+  -OEChem-03111921513D
+
+ 20 20  0     0  0  0  0  0  0999 V2000
+    3.8509    0.4516    0.0012 O   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.5999    1.4041   -0.0018 O   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.5705   -0.7171    0.0001 N   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.2066   -0.4231   -0.0002 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.2205    0.9047    0.0004 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.7298   -1.4570   -0.0007 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.5841    1.1986    0.0002 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.0933   -1.1629   -0.0007 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.5204    0.1648   -0.0003 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.6485    0.1782    0.0009 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -3.9735   -0.5420    0.0010 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.4436    1.7577    0.0012 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.4113   -2.4963   -0.0010 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8010   -1.7086    0.0001 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.9053    2.2370    0.0009 H   0  0  0  0  0  0  0  0  0  0  0  0
+    2.8180   -1.9726   -0.0008 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -4.0655   -1.1463   -0.9058 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -4.7904    0.1844    0.0288 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -4.0445   -1.1886    0.8802 H   0  0  0  0  0  0  0  0  0  0  0  0
+    3.9650    1.4176    0.0017 H   0  0  0  0  0  0  0  0  0  0  0  0
+  1  9  1  0  0  0  0
+  1 20  1  0  0  0  0
+  2 10  2  0  0  0  0
+  3  4  1  0  0  0  0
+  3 10  1  0  0  0  0
+  3 14  1  0  0  0  0
+  4  5  2  0  0  0  0
+  4  6  1  0  0  0  0
+  5  7  1  0  0  0  0
+  5 12  1  0  0  0  0
+  6  8  2  0  0  0  0
+  6 13  1  0  0  0  0
+  7  9  2  0  0  0  0
+  7 15  1  0  0  0  0
+  8  9  1  0  0  0  0
+  8 16  1  0  0  0  0
+ 10 11  1  0  0  0  0
+ 11 17  1  0  0  0  0
+ 11 18  1  0  0  0  0
+ 11 19  1  0  0  0  0
+M  END
+$$$$
+'''
+~~~
+
+~~~
+from ccgnet.Dataset import Dataset, DataLoader
+
+data = Dataset('./Samples/CC_Table.tab', mol_blocks_dir='./Samples/Mol_Blocks.dir')
+data.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0, contact=0, make_dataframe=True)
+~~~
+~~~
+import tensorflow as tf
+from ccgnet import experiment as exp
+from ccgnet import layers
+import time
+from ccgnet.Dataset import Dataset, DataLoader
+~~~
