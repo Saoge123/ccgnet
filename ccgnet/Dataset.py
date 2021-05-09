@@ -224,28 +224,28 @@ class Dataset(object):
             data = [V, A, labels, masks, graph_size, tags]
             return [np.array(i) for i in data]
             
-    def split(self, train_samples=None, test_samples=None, val=False, val_samples=None, with_fps=False):
+    def split(self, train_samples=None, valid_samples=None, with_test=False, test_samples=None, with_fps=False):
         self.train_samples = train_samples
-        self.test_samples = test_samples
-        self.val = val
-        if self.val:
-            self.val_samples = val_samples
+        self.valid_samples = valid_samples
+        self.with_test = with_test
+        if self.with_test:
+            self.test_samples = test_samples
         if with_fps:
             train_data = self._embedding_func(self.train_samples, self.dataframe)
-            test_data = self._embedding_func(self.test_samples, self.dataframe)
-            if self.val:
-                val_data = self._embedding_func(self.val_samples, self.dataframe)
-                return train_data, test_data, val_data
+            valid_data = self._embedding_func(self.valid_samples, self.dataframe)
+            if self.with_test:
+                test_data = self._embedding_func(self.test_samples, self.dataframe)
+                return train_data, valid_data, test_data
             else:
-                return train_data, test_data
+                return train_data, valid_data
         else:
             train_data = self._graph_func(self.train_samples, self.dataframe)
-            test_data = self._graph_func(self.test_samples, self.dataframe)
-            if self.val:
-                val_data = self._graph_func(self.val_samples, self.dataframe)
-                return train_data, test_data, val_data
+            valid_data = self._graph_func(self.valid_samples, self.dataframe)
+            if self.with_test:
+                test_data = self._graph_func(self.test_samples, self.dataframe)
+                return train_data, valid_data, test_data
             else:
-                return train_data, test_data
+                return train_data, valid_data
 
 
 class DataLoader(Dataset):
