@@ -109,7 +109,8 @@ If you want to make your own dataset, ccgnet also provide Dataset class.
 First, you need prepare two files like 'CC_Table.tab' and 'Mol_Blocks.dir' in './Samples/'.
 'CC_Table.tab' reprensents the pairs of coformers. 
 'Mol_Blocks.dir' is a text file with python dictionary format, whose key is the coformer name in 'CC_Table.tab' and value is string with 3D 'sdf' format.
-Note that the input 'sdf' string should preferably be an optimized 3D structure.
+
+**Note** that the input 'sdf' string should preferably be an optimized 3D structure.
 ~~~
 mol_block = eval(open('./Samples/Mol_Blocks.dir').read())
 print(mol_block['1983'])
