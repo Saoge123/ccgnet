@@ -162,13 +162,14 @@ M  END
 $$$$
 '''
 ~~~
-
+We can build the dataset based on the two file:
 ~~~
 from ccgnet.Dataset import Dataset, DataLoader
 
 data = Dataset('./Samples/CC_Table.tab', mol_blocks_dir='./Samples/Mol_Blocks.dir')
-data.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0, contact=0, make_dataframe=True)
+data.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0, contact=0, make_dataframe=True, save_name=None)
 ~~~
+If save_name is not None, the dataset will be saved as a 'save_name'.npz file to your disk. 
 ~~~
 import tensorflow as tf
 from ccgnet import experiment as exp
