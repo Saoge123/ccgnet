@@ -70,7 +70,7 @@ The atom features and global_state can be computed by:
 ~~~
 V = c.VertexMatrix.feature_matrix()
 global_state = c.descriptors()
-print(A.shape, V.shape, global_state.shape)
+print(V.shape, global_state.shape)
 #Out: (20, 34) (12,)
 ~~~
 Two Coformer objects can be transformed to a Cocrystal object. The features can be calculated by the same way:
