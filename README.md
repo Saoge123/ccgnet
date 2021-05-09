@@ -48,7 +48,7 @@ Finally, the predictive result is written in a .xlsx file, eg. cc_test.xlsx.
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/xlsx.png)
 
 In CCGNet, Coformer object is the basic data unit, for each compound:
-~~~
+~~~python
 from Featurize import Coformer
 
 c = Coformer('./Test/coformers/1983.sdf')
