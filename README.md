@@ -247,7 +247,7 @@ History['test_acc'] = []
 History['val_acc'] = []
 for fold in ['fold-{}'.format(i) for i in range(10)]:
     print('\n################ {} ################'.format(fold))
-    train_data, valid_data, test_data = data.split(train_samples=fold_10[fold]['train'], test_samples=fold_10[fold]['valid'], val=True, val_samples=fold_10['test'])
+    train_data, valid_data, test_data = data.split(train_samples=fold_10[fold]['train'], valid_samples=fold_10[fold]['valid'], with_test=True, test_samples=fold_10['test'])
     tf.reset_default_graph()
     model = CCGNet_block()
     model = exp.Model(model, train_data, valid_data, with_test=True, test_data=test_data, snapshot_path=snapshot_path, use_subgraph=True,
