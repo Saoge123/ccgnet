@@ -1,5 +1,6 @@
-# ccgnet
+# Co-Crystal Graph Network (CCGNet)
 ![image](https://github.com/Saoge123/ccgnet/blob/main/img/cfg.png)
+
 CCGNet (Co-Crystal Graph Network) is a deep learning framework for virtual screening of binary organic cocrystals, which integrates the priori knowledge into the feature learning on molecular graph and achieves a great improvement of performance for data-driven cocrystal screening.
 
 Requirements:
