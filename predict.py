@@ -207,7 +207,7 @@ def Bagging(scores):
     bagging = all_pred_labels > 5
     #bagging_labels = np.array(['Yes' if i else 'No' for i in bagging ])
     sum_scores = np.array(scores).sum(axis=0)
-    return sum_scores[:,1]
+    return sum_scores[:,1] #, bagging_labels
 
 def GetCoformerSmiles(cc_table, mol_dir='./coformers'):
     table = [line.strip().split('\t') for line in open(cc_table).readlines()]
@@ -224,7 +224,7 @@ def GetCoformerSmiles(cc_table, mol_dir='./coformers'):
 def main(table, mol_dir, fmt='sdf', xlsx_name='Result.xlsx', model_path='./snapshot/CCGNet_block/CC_Dataset/'):
     #######  Inference  #######
     paths = glob.glob(model_path+'/*/')
-    meta_file = tf.train.latest_checkpoint(path[0])+'.meta'
+    meta_file = tf.train.latest_checkpoint(paths[0])+'.meta'
     infer = Inference(table, meta_file, mol_dir=mol_dir, mol_file_type=fmt)
     
     score_pool = []
@@ -237,10 +237,12 @@ def main(table, mol_dir, fmt='sdf', xlsx_name='Result.xlsx', model_path='./snaps
     sum_scores = sum_scores[sorted_args]
     tags = tags[sorted_args]
     Smiles = Smiles[sorted_args]
+    #bagging_labels = bagging_labels[sorted_args]
     
     #######  write Excel  #######
     import xlsxwriter
         
+    #header = ['Coformer 1', 'SMILES', 'Coformer 2', 'SMILES', 'Tag', 'Score', 'Cocrystal']
     header = ['Coformer 1', 'SMILES', 'Coformer 2', 'SMILES', 'Tag', 'Score']
     item_style = {'align':'center','valign': 'vcenter','top':2,'left':2,
                  'right':2,'bottom':2,'text_wrap':1}
@@ -255,13 +257,14 @@ def main(table, mol_dir, fmt='sdf', xlsx_name='Result.xlsx', model_path='./snaps
     worksheet.set_column('C:C', 39)
     worksheet.set_column('D:D', 18)
     worksheet.set_column('E:E', 10)
+    #worksheet.set_column('F:F', 15)
     for ix_, i in enumerate(header):
         worksheet.write(0, ix_, i, HeaderStyle)
 
     for ix, i in enumerate(tags):
         smi1, smi2 = Smiles[ix]
         score = sum_scores[ix]
-
+        #label = bagging_labels[ix]
         img_data_1 = BytesIO()
         c1 = Chem.MolFromSmiles(smi1)
         img1 = Draw.MolToImage(c1)
@@ -275,9 +278,10 @@ def main(table, mol_dir, fmt='sdf', xlsx_name='Result.xlsx', model_path='./snaps
         worksheet.insert_image(ix+1, 0, 'f', {'x_scale': 0.9, 'y_scale': 0.8, 'image_data':img_data_1, 'positioning':1})
         worksheet.write(ix+1, 1, smi1, ItemStyle)
         worksheet.insert_image(ix+1, 2, 'f', {'x_scale': 0.9, 'y_scale': 0.8, 'image_data':img_data_2, 'positioning':1})
-        worksheet.write(ix+1, 3, smi1, ItemStyle)
+        worksheet.write(ix+1, 3, smi2, ItemStyle)
         worksheet.write(ix+1, 4, i, ItemStyle)
         worksheet.write(ix+1, 5, score, ItemStyle)
+        #worksheet.write(ix+1, 6, label, ItemStyle)
     workbook.close()
 
 def parameter():
