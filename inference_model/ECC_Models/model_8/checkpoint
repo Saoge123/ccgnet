@@ -1,0 +1,3 @@
+model_checkpoint_path: "TestAcc-0.98-27"
+all_model_checkpoint_paths: "TestAcc-1.04-25"
+all_model_checkpoint_paths: "TestAcc-0.98-27"
