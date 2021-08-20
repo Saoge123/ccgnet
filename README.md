@@ -209,10 +209,17 @@ The model construction.
 ~~~python
 import tensorflow as tf
 from ccgnet import experiment as exp
+from ccgnet.finetune import *
 from ccgnet import layers
+from ccgnet.layers import *
+import numpy as np
 import time
+from sklearn.metrics import balanced_accuracy_score
+from ccgnet.Dataset import Dataset, DataLoader
+from Featurize.Coformer import Coformer
+from Featurize.Cocrystal import Cocrystal
 
-class CCGNet_block(object):
+class CCGNet(object):
     def build_model(self, inputs, is_training, global_step):
         V = inputs[0]
         A = inputs[1]
@@ -222,18 +229,29 @@ class CCGNet_block(object):
         tags = inputs[5]
         global_state = inputs[6]
         subgraph_size = inputs[7]
-        global_state = tf.reshape(global_state, [-1, int(global_state.get_shape()[-1].value/2)])
-        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=128, mask=mask, num_updates=global_step, is_training=is_training)
-        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=64, mask=mask, num_updates=global_step, is_training=is_training)
-        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=64, mask=mask, num_updates=global_step, is_training=is_training)
-        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=32, mask=mask, num_updates=global_step, is_training=is_training)
-        V, global_state = layers.CCGBlock(V, A, global_state, subgraph_size, no_filters=16, mask=mask, num_updates=global_step, is_training=is_training)
-        V = layers.multi_head_global_attention(V, graph_size, num_head=10)
-        global_state = tf.reshape(global_state, [-1, 32])
-        V = tf.concat([V, global_state], 1)
-        V = layers.make_embedding_layer(V, 256, name='FC')
-        V = layers.make_bn(V, is_training, mask=None, num_updates=global_step)
-        V = tf.nn.relu(V)
+        # message passing 
+        V, global_state = CCGBlock(V, A, global_state, subgraph_size, no_filters=64, mask=mask, num_updates=global_step, is_training=is_training)
+        V, global_state = CCGBlock(V, A, global_state, subgraph_size, no_filters=16, mask=mask, num_updates=global_step, is_training=is_training)
+        V, global_state = CCGBlock(V, A, global_state, subgraph_size, no_filters=64, mask=mask, num_updates=global_step, is_training=is_training)
+        V, global_state = CCGBlock(V, A, global_state, subgraph_size, no_filters=16, mask=mask, num_updates=global_step, is_training=is_training)
+        # readout
+        V = ReadoutFunction(V, global_state, graph_size, num_head=2, is_training=is_training)
+        # predict
+        with tf.compat.v1.variable_scope('Predictive_FC_1') as scope:
+            V = layers.make_embedding_layer(V, 256)
+            V = layers.make_bn(V, is_training, mask=None, num_updates=global_step)
+            V = tf.nn.relu(V)
+            V = tf.compat.v1.layers.dropout(V, 0.457, training=is_training)
+        with tf.compat.v1.variable_scope('Predictive_FC_2') as scope:
+            V = layers.make_embedding_layer(V, 1024)
+            V = layers.make_bn(V, is_training, mask=None, num_updates=global_step)
+            V = tf.nn.relu(V)
+            V = tf.compat.v1.layers.dropout(V, 0.457, training=is_training)
+        with tf.compat.v1.variable_scope('Predictive_FC_3') as scope:
+            V = layers.make_embedding_layer(V, 256)
+            V = layers.make_bn(V, is_training, mask=None, num_updates=global_step)
+            V = tf.nn.relu(V)
+            V = tf.compat.v1.layers.dropout(V, 0.457, training=is_training)
         out = layers.make_embedding_layer(V, 2, name='final')
         return out, labels
 ~~~
