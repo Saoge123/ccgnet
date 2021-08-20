@@ -169,8 +169,10 @@ We can build the dataset based on these two file, such as:
 ~~~python
 from ccgnet.Dataset import Dataset, DataLoader
 
-data = Dataset('./Samples/CC_Table.tab', mol_blocks_dir='./Samples/Mol_Blocks.dir')
-data.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0, contact=0, make_dataframe=True, save_name=None)
+data1 = Dataset('data/CC_Table/ECC&CC_Table.tab', mol_blocks_dir='data/Mol_Blocks.dir')
+data1.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0, contact=0, make_dataframe=True)
+data2 = Dataset('data/CC_Table/CC_Table-DataAug.tab', mol_blocks_dir='data/Mol_Blocks.dir')
+data2.make_graph_dataset(Desc=1, A_type='OnlyCovalentBond', hbond=0, pipi_stack=0, contact=0, make_dataframe=True)
 ~~~
 If save_name is not None, the dataset will be saved as a 'save_name'.npz file to your disk.
 If make_dataframe=True, object data will make a new property .dataframe. Each entry holds the data for the corresponding sample, like:
@@ -180,11 +182,14 @@ data.dataframe['UNEYOB'].keys()
 ~~~
 To train and test the model, we firstly split out the test set.
 ~~~python
-nico = eval(open('./Test/test_samples/Nicotinamide_Test.list').read())
-carb = eval(open('./Test/test_samples/Carbamazepine_Test.list').read())
-indo = eval(open('./Test/test_samples/Indomethacin_Test.list').read())
-para = eval(open('./Test/test_samples/Paracetamol_Test.list').read())
-pyre = eval(open('./Test/test_samples/Pyrene_Test.list').read())
+nico = eval(open('data/Test/Test_Samples/Nicotinamide_Test.list').read())
+carb = eval(open('data/Test/Test_Samples/Carbamazepine_Test.list').read())
+indo = eval(open('data/Test/Test_Samples/Indomethacin_Test.list').read())
+para = eval(open('data/Test/Test_Samples/Paracetamol_Test.list').read())
+pyre = eval(open('data/Test/Test_Samples/Pyrene_Test.list').read())
+apis = list(set(nico + indo + para + carb))
+cl20 = eval(open('data/Test/Test/Test_Samples/CL-20_Test.list').read())
+tnt = eval(open('data/Test/Test_Samples/TNT_Test.list').read())
 # these samples that are selected as out-of-sample test are the same with our paper.
 test = list(set(nico + carb + indo + para + pyre))
 ~~~
@@ -261,16 +266,22 @@ We call data.split to split train_data, valid_data and test_data. The test_data 
 ~~~python
 start = time.time()
 snapshot_path = './snapshot/'
-model_name = 'CCGNet_block'
+model_name = 'CCGNet'
 dataset_name = 'CC_Dataset'
 for fold in ['fold-{}'.format(i) for i in range(10)]:
     print('\n################ {} ################'.format(fold))
-    train_data, valid_data, test_data = data.split(train_samples=fold_10[fold]['train'], valid_samples=fold_10[fold]['valid'], with_test=True, test_samples=fold_10['test'])
+    train_data1, valid_data1, test_data1 = data1.split(train_samples=fold_10[fold]['train'], valid_samples=fold_10[fold]['valid'], with_test=True, test_samples=fold_10['test'])
+    train_data2, valid_data2 = data2.split(train_samples=fold_10[fold]['train'], valid_samples=fold_10[fold]['valid'], with_test=False)
+    train_data = []
+    for ix, i in enumerate(train_data1):
+        train_data.append(np.concatenate([i, train_data2[ix]]))
+    del train_data2
+    del train_data1
     tf.reset_default_graph()
-    model = CCGNet_block()
-    model = exp.Model(model, train_data, valid_data, with_test=True, test_data=test_data, snapshot_path=snapshot_path, use_subgraph=True,
+    model = CCGNet()
+    model = exp.Model(model, train_data, valid_data1, with_test=True, test_data=test_data1, snapshot_path=snapshot_path, use_subgraph=True,
                       model_name=model_name, dataset_name=dataset_name+'/time_{}'.format(fold[-1]))
-    history = model.fit(num_epoch=100, save_info=True, save_att=True, silence=0, train_batch_size=256,
+    history = model.fit(num_epoch=100, save_info=True, save_att=True, silence=0, train_batch_size=128,
                         metric='acc')
 end = time.time()
 time_gap = end-start
